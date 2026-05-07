@@ -23,7 +23,7 @@ const seedFlights = [
 
 function createStore() {
   return {
-    flights: seedFlights.map((flight) => ({ ...flight })),
+    flights: structuredClone(seedFlights),
     bookings: [],
     nextBookingSequence: 1
   };

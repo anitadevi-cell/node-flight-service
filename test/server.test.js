@@ -69,9 +69,9 @@ test('POST /bookings creates a booking and decreases available seats', async () 
 
   assert.equal(response.statusCode, 201);
   assert.equal(response.body.flightId, 'FL-1001');
-  const bookedFlight = store.flights.find((flight) => flight.id === 'FL-1001');
-  assert.ok(bookedFlight);
-  assert.equal(bookedFlight.availableSeats, 1);
+  const flightAfterBooking = store.flights.find((flight) => flight.id === 'FL-1001');
+  assert.ok(flightAfterBooking);
+  assert.equal(flightAfterBooking.availableSeats, 1);
   assert.equal(store.bookings.length, 1);
   assert.equal(store.bookings[0].passengerName, 'Anita Devi');
 
