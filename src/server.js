@@ -24,7 +24,8 @@ const seedFlights = [
 function createStore() {
   return {
     flights: seedFlights.map((flight) => ({ ...flight })),
-    bookings: []
+    bookings: [],
+    nextBookingSequence: 1
   };
 }
 
@@ -93,13 +94,14 @@ function createBooking(store, payload) {
 
   flight.availableSeats -= 1;
   const booking = {
-    id: `BK-${String(store.bookings.length + 1).padStart(4, '0')}`,
+    id: `BK-${String(store.nextBookingSequence).padStart(4, '0')}`,
     flightId,
     passengerName: passengerName.trim(),
     createdAt: new Date().toISOString()
   };
 
   store.bookings.push(booking);
+  store.nextBookingSequence += 1;
 
   return {
     statusCode: 201,
