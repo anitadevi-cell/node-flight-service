@@ -1,4 +1,5 @@
 const http = require('node:http');
+const MAX_REQUEST_BODY_SIZE = 1_000_000;
 
 const seedFlights = [
   {
@@ -44,7 +45,7 @@ function parseJsonBody(req) {
 
     req.on('data', (chunk) => {
       body += chunk;
-      if (body.length > 1_000_000) {
+      if (body.length > MAX_REQUEST_BODY_SIZE) {
         reject(new Error('Request body too large'));
         req.destroy();
       }
