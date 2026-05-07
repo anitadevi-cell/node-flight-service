@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const test = require('node:test');
 const { createServer, createStore } = require('../src/server');
 
-function request(server, { method, path, body }) {
+function makeTestRequest(server, { method, path, body }) {
   const port = server.address().port;
   const payload = body ? JSON.stringify(body) : null;
 
@@ -48,7 +48,7 @@ test('GET /health returns service status', async () => {
   const server = createServer(createStore());
   await new Promise((resolve) => server.listen(0, resolve));
 
-  const response = await request(server, { method: 'GET', path: '/health' });
+  const response = await makeTestRequest(server, { method: 'GET', path: '/health' });
 
   assert.equal(response.statusCode, 200);
   assert.deepEqual(response.body, { status: 'ok' });
@@ -61,7 +61,7 @@ test('POST /bookings creates a booking and decreases available seats', async () 
   const server = createServer(store);
   await new Promise((resolve) => server.listen(0, resolve));
 
-  const response = await request(server, {
+  const response = await makeTestRequest(server, {
     method: 'POST',
     path: '/bookings',
     body: { flightId: 'FL-1001', passengerName: 'Anita Devi' }
@@ -72,6 +72,8 @@ test('POST /bookings creates a booking and decreases available seats', async () 
   const bookedFlight = store.flights.find((flight) => flight.id === 'FL-1001');
   assert.ok(bookedFlight);
   assert.equal(bookedFlight.availableSeats, 1);
+  assert.equal(store.bookings.length, 1);
+  assert.equal(store.bookings[0].passengerName, 'Anita Devi');
 
   await new Promise((resolve) => server.close(resolve));
 });
@@ -81,13 +83,13 @@ test('POST /bookings returns conflict when seats are unavailable', async () => {
   const server = createServer(store);
   await new Promise((resolve) => server.listen(0, resolve));
 
-  await request(server, {
+  await makeTestRequest(server, {
     method: 'POST',
     path: '/bookings',
     body: { flightId: 'FL-3003', passengerName: 'First Passenger' }
   });
 
-  const secondResponse = await request(server, {
+  const secondResponse = await makeTestRequest(server, {
     method: 'POST',
     path: '/bookings',
     body: { flightId: 'FL-3003', passengerName: 'Second Passenger' }

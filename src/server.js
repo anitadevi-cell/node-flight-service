@@ -69,8 +69,9 @@ function parseJsonBody(req) {
 
 function createBooking(store, payload) {
   const { flightId, passengerName } = payload;
+  const normalizedPassengerName = typeof passengerName === 'string' ? passengerName.trim() : '';
 
-  if (!flightId || !passengerName || typeof passengerName !== 'string') {
+  if (!flightId || typeof flightId !== 'string' || !normalizedPassengerName) {
     return {
       statusCode: 400,
       payload: { error: 'flightId and passengerName are required' }
@@ -96,7 +97,7 @@ function createBooking(store, payload) {
   const booking = {
     id: `BK-${String(store.nextBookingSequence).padStart(4, '0')}`,
     flightId,
-    passengerName: passengerName.trim(),
+    passengerName: normalizedPassengerName,
     createdAt: new Date().toISOString()
   };
 
