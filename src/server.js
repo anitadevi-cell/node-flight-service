@@ -42,16 +42,31 @@ function sendJson(res, statusCode, payload) {
 function parseJsonBody(req) {
   return new Promise((resolve, reject) => {
     let body = '';
+    let isRejected = false;
+
+    function rejectOnce(error) {
+      if (isRejected) {
+        return;
+      }
+      isRejected = true;
+      reject(error);
+    }
 
     req.on('data', (chunk) => {
+      if (isRejected) {
+        return;
+      }
       body += chunk;
       if (body.length > MAX_REQUEST_BODY_SIZE) {
-        reject(new Error('Request body too large'));
+        rejectOnce(new Error('Request body too large'));
         req.destroy();
       }
     });
 
     req.on('end', () => {
+      if (isRejected) {
+        return;
+      }
       if (!body) {
         resolve({});
         return;
@@ -60,11 +75,11 @@ function parseJsonBody(req) {
       try {
         resolve(JSON.parse(body));
       } catch (error) {
-        reject(new Error('Invalid JSON body'));
+        rejectOnce(new Error('Invalid JSON body'));
       }
     });
 
-    req.on('error', reject);
+    req.on('error', rejectOnce);
   });
 }
 

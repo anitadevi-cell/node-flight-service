@@ -83,11 +83,12 @@ test('POST /bookings returns conflict when seats are unavailable', async () => {
   const server = createServer(store);
   await new Promise((resolve) => server.listen(0, resolve));
 
-  await makeTestRequest(server, {
+  const firstResponse = await makeTestRequest(server, {
     method: 'POST',
     path: '/bookings',
     body: { flightId: 'FL-3003', passengerName: 'First Passenger' }
   });
+  assert.equal(firstResponse.statusCode, 201);
 
   const secondResponse = await makeTestRequest(server, {
     method: 'POST',
