@@ -1,0 +1,11 @@
+{
+  "name": "node-flight-service",
+  "version": "1.0.0",
+  "description": "Minimal flight booking backend using Node.js",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test"
+  },
+  "license": "MIT"
+}
